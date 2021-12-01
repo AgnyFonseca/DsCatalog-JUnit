@@ -1,6 +1,7 @@
 package com.devsuperior.dscatalog.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,8 +49,14 @@ public class ProductServiceTests {
 		product = Factory.createProduct();
 		page = new PageImpl<>(List.of(product));
 		
-		//Metódo que retorna um valor, primeiro when e depois "then" ...
+		//Metódo que retorna um valor, primeiro when e depois "thenReturn" ...
 		Mockito.when(repository.findAll((Pageable)ArgumentMatchers.any())).thenReturn(page);
+		
+		Mockito.when(repository.save(ArgumentMatchers.any())).thenReturn(product);
+		
+		Mockito.when(repository.findById(existingId)).thenReturn(Optional.of(product));
+		
+		Mockito.when(repository.findById(nonExistingId)).thenReturn(Optional.empty());
 		
 		//Configurar comportamento simulado pelo Mockito, método void, primeiro "do" something e depois when
 		Mockito.doNothing().when(repository).deleteById(existingId);
