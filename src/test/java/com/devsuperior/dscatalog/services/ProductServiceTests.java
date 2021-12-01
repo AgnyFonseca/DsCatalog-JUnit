@@ -1,19 +1,26 @@
 package com.devsuperior.dscatalog.services;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.devsuperior.dscatalog.entities.Product;
 import com.devsuperior.dscatalog.repositories.ProductRepository;
 import com.devsuperior.dscatalog.services.exceptions.DatabaseException;
 import com.devsuperior.dscatalog.services.exceptions.ResourceNotFoundException;
+import com.devsuperior.dscatalog.tests.Factory;
 
 //TESTE UNITÁRIO
 @ExtendWith(SpringExtension.class)
@@ -29,13 +36,22 @@ public class ProductServiceTests {
 	private long nonExistingId;
 	private long dependentId;
 	
+	//PageImpl tipo concreto que representa uma página de dados, usado em testes
+	private PageImpl<Product> page;
+	private Product product;
+	
 	@BeforeEach
 	void setUp() throws Exception {
 		existingId = 1L;
-		nonExistingId = 1000L;
-		dependentId = 4L;
+		nonExistingId = 2L;
+		dependentId = 3L;
+		product = Factory.createProduct();
+		page = new PageImpl<>(List.of(product));
 		
-		//Configurar comportamento simulado pelo Mockito
+		//Metódo que retorna um valor, primeiro when e depois "then" ...
+		Mockito.when(repository.findAll((Pageable)ArgumentMatchers.any())).thenReturn(page);
+		
+		//Configurar comportamento simulado pelo Mockito, método void, primeiro "do" something e depois when
 		Mockito.doNothing().when(repository).deleteById(existingId);
 		
 		//Configurar comportamento simulado pelo Mockito
